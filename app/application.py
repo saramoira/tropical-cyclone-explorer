@@ -239,23 +239,16 @@ def update_graphs(storm_name, selected_time, rgb_selection):
 		raise PreventUpdate
 
 	df = storm_dataset[storm_dataset['storm_name'].eq(storm_name)].reset_index(drop=True)
-	m1 = f'{df.m1_combined[selected_time]}'
-	m2 = f'{df.m2_combined[selected_time]}'
+	m1 = fs.open(fs.glob(f'{df.m1_combined[selected_time]}*.nc')[0])
+	m2 = fs.open(fs.glob(f'{df.m2_combined[selected_time]}*.nc')[0])
 	
-	m1_key = m1.split('/')[-1]
-	m2_key = m2.split('/')[-1]
-
-	fs.get(m1, f'{m1_key}')
-	fs.get(m2, f'{m2_key}')
-
-
-	with xr.open_dataset(m1_key) as m1_data:
+	with xr.open_dataset(m1) as m1_data:
 		n1 = m1_data.geospatial_lat_lon_extent.attrs['geospatial_northbound_latitude']
 		e1 = m1_data.geospatial_lat_lon_extent.attrs['geospatial_eastbound_longitude']
 		s1 = m1_data.geospatial_lat_lon_extent.attrs['geospatial_southbound_latitude']
 		w1 = m1_data.geospatial_lat_lon_extent.attrs['geospatial_westbound_longitude']
 		
-		with xr.open_dataset(m2_key) as m2_data:
+		with xr.open_dataset(m2) as m2_data:
 			n2 = m2_data.geospatial_lat_lon_extent.attrs['geospatial_northbound_latitude']
 			e2 = m2_data.geospatial_lat_lon_extent.attrs['geospatial_eastbound_longitude']
 			s2 = m2_data.geospatial_lat_lon_extent.attrs['geospatial_southbound_latitude']
@@ -420,7 +413,7 @@ def update_graphs(storm_name, selected_time, rgb_selection):
 			image_fig.update_layout(margin=dict(l=10, r=10, b=10, t=10)
 			)
 			image_fig.update_traces(hovertemplate=None, hoverinfo='skip')
-			image_fig.update_xaxes(visible=False).update_yaxes(visible=False')
+			image_fig.update_xaxes(visible=False).update_yaxes(visible=False, autorange='reversed')
 			image_fig
 
 		return map_fig, surface_fig, image_fig
@@ -469,4 +462,4 @@ def update_slider(storm_name):
 	return min, max, value
 
 if __name__ == '__main__':
-	application.run(host='0.0.0.0', port=8050, debug=False)
+	application.run(host='0.0.0.0', port=8050, debug=True)

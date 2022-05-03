@@ -1,1 +1,1 @@
-# tropical-cyclone-explorer
+App to browse mesoscale hurricane/tropical storm imagery from GOES-16
